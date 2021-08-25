@@ -1,0 +1,119 @@
+.card-header {
+    border-bottom: 1px solid #ebedf2;
+}
+
+.card {
+    box-shadow: 0 0 13px 0 rgba(82, 63, 105, 0.05);
+    border-radius: 4px;
+}
+
+.content-wrapper {
+    background-color: #f2f3f8;
+    padding-top: 16px;
+}
+
+.main-sidebar {
+    background-color: #242939;
+}
+
+.control-sidebar-light {
+    background-color: white;
+    border-style: none;
+    border-color: white ;
+}
+
+.control-sidebar {
+    z-index: 2000;
+}
+
+.control-sidebar-content {
+    box-shadow: -15px 0 20px -1px rgba(82, 63, 105, 0.1);
+}
+
+.control-sidebar .card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.brand-link {
+    background-color: #242939 !important;
+    border: 0 !important;
+    color: white !important;
+    height: 58px;
+}
+
+.main-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #eff0f6 ;
+    box-shadow: 0 10px 30px -1px rgba(82, 63, 105, 0.1) ;
+}
+
+.sub-header {
+    margin-bottom: 20px;
+}
+
+.btn-light {
+    background-color: white !important;
+    border: 1px solid #ced4da !important;
+    border-radius: .25rem !important;
+}
+
+.shinyhelper-wrapper {
+    width: 300px;
+    max-width: 100%;
+}
+
+hr {
+    border-top: 1px solid #f0f0f0;
+}
+
+body {
+    background-color: #f2f3f8;
+}
+
+.modal-header {
+    /* Remove for shinyFiles support */
+    /*display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    -ms-flex-pack: justify;
+    justify-content: space-between; */
+    padding: 1rem ;
+    border-bottom: 1px solid #e9ecef;
+    border-top-left-radius: 0.3rem;
+    border-top-right-radius: 0.3rem;
+}
+
+.modal.fade .modal-dialog {
+    transition: -webkit-transform 0.3s ease-out ;
+    transition: transform 0.3s ease-out ;
+    transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out ;
+    -webkit-transform: translate(0, -50px) ;
+    transform: translate(0, -50px) ;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+    color: #fff !important;
+}
+
+.mini-container {
+    border-radius: 4px;
+    background-color: #fff;
+    margin-right: 8px;
+    margin-left: 8px;
+    margin-bottom: 12px;
+    padding: 8px;
+    box-shadow: 0 0 13px 0 rgba(82, 63, 105, 0.05);
+    border: 1px solid rgba(0,0,0,.05);
+}
+
+.mini-container-plot {
+    border-radius: 4px;
+    background-color: #fff;
+    margin-bottom: 12px;
+    padding: 8px;
+    box-shadow: 0 0 13px 0 rgba(82, 63, 105, 0.05);
+    border: 1px solid rgba(0,0,0,.05);
+    width: 100%;
+}
