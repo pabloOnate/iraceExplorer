@@ -7,7 +7,7 @@ Navbar <- R6::R6Class(
 
       dashboardHeader(
         title = dashboardBrand(
-          title = h2("Irace Vizz", style = "text-align:center; margin-bottom: 0;")
+          title = h2("Irace Explorer", style = "text-align:center; margin-bottom: 0;")
         ),
         fixed = TRUE,
         h4(
@@ -33,6 +33,11 @@ Body <- R6::R6Class(
     filter_view = NULL,
     performance_instance = NULL,
     performance_config = NULL,
+    advanced_parallel_coord = NULL,
+    advanced_boxplot_train = NULL,
+    advanced_boxplot_test = NULL,
+    advanced_sampling_frequency = NULL,
+
 
     initialize = function() {
       self$overview <- Overview$new("overview")
@@ -40,6 +45,11 @@ Body <- R6::R6Class(
       self$filter_view <- FilterView$new("visualization_filter")
       self$performance_instance <- PerformanceInstanceView$new("visualization_by_instance")
       self$performance_config <- PerformanceConfigView$new("visualization_by_config")
+
+      self$advanced_parallel_coord <- AdvancedParallelCoord$new("adv_parallel_coord_view")
+      self$advanced_boxplot_train <- AdvancedBoxplotTrain$new("adv_boxplot_train")
+      self$advanced_boxplot_test <- AdvancedBoxplotTest$new("adv_boxplot_test")
+      self$advanced_sampling_frequency <- AdvancedSamplingFrequency$new("adv_sampling_frequency")
     },
 
     ui = function() {
@@ -61,6 +71,22 @@ Body <- R6::R6Class(
           tabItem(
             tabName = "visualization_by_instance",
             self$performance_instance$ui()
+          ),
+          tabItem(
+            tabName = "adv_parallel_coord_view",
+            self$advanced_parallel_coord$ui()
+          ),
+          tabItem(
+            tabName = "adv_boxplot_train",
+            self$advanced_boxplot_train$ui()
+          ),
+          tabItem(
+            tabName = "adv_boxplot_test",
+            self$advanced_boxplot_test$ui()
+          ),
+          tabItem(
+            tabName = "adv_sampling_frequency",
+            self$advanced_sampling_frequency$ui()
           )
         )
       )
@@ -72,6 +98,11 @@ Body <- R6::R6Class(
       self$filter_view$call(store = store, events = events)
       self$performance_instance$call(store = store, events = events)
       self$performance_config$call(store = store, events = events)
+
+      self$advanced_parallel_coord$call(store = store)
+      self$advanced_boxplot_train$call(store = store)
+      self$advanced_boxplot_test$call(store = store)
+      self$advanced_sampling_frequency$call(store = store)
     }
   )
 )
@@ -82,6 +113,7 @@ Sidebar <- R6::R6Class(
   public = list(
     ui = function() {
       dashboardSidebar(
+        id = "dash",
         minified = FALSE,
         sidebarMenu(
           menuItem(
@@ -95,7 +127,7 @@ Sidebar <- R6::R6Class(
               text = "Configuration",
               tabName = "visualization_by_config",
               icon = NULL
-             ),
+            ),
             menuSubItem(
               text = "Instance",
               tabName = "visualization_by_instance",
@@ -106,6 +138,29 @@ Sidebar <- R6::R6Class(
             text = "Filter",
             tabName = "visualization_filter",
             icon = NULL
+          ),
+          menuItem(
+            text = strong("Advanced"),
+            menuSubItem(
+              text = "Paralell Cordinate",
+              tabName = "adv_parallel_coord_view",
+              icon = NULL
+            ),
+            menuSubItem(
+              text = "Boxplot Train",
+              tabName = "adv_boxplot_train",
+              icon = NULL
+            ),
+            menuSubItem(
+              text = "Boxplot Test",
+              tabName = "adv_boxplot_test",
+              icon = NULL
+            ),
+            menuSubItem(
+              text = "Sampling Frequency",
+              tabName = "adv_sampling_frequency",
+              icon = NULL
+            )
           )
         )
       )

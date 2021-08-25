@@ -12,7 +12,7 @@ Overview <- R6::R6Class(
         ),
         fluidRow(
           column(
-            width = 7,
+            width = 12,
             fluidRow(
               div(
                 class = "col mini-container",
@@ -27,42 +27,75 @@ Overview <- R6::R6Class(
               div(
                 class = "col mini-container",
                 htmlOutput(outputId = ns("best")),
-                h5(strong("Best Configuration"))
+                h5(strong("Best Configuration ID"))
               )
             ),
             fluidRow(
-              box(
-                title = strong("Left 1"),
-                collapsible = FALSE,
-                closable = FALSE,
-                width = 12,
-                plotlyOutput(outputId = ns("left_1"))
+              div(
+                class = "col mini-container",
+                htmlOutput(outputId = ns("iterations")),
+                h5(strong("Iterations"))
               ),
+              div(
+                class = "col mini-container",
+                htmlOutput(outputId = ns("instances")),
+                h5(strong("Instances"))
+              ),
+              div(
+                class = "col mini-container",
+                htmlOutput(outputId = ns("elit")),
+                h5(strong("Elite"))
+              )
+            ),
+            fluidRow(
+
               box(
-                title = strong("Left 2"),
+                title = strong("Parallel Coordinates"),
                 collapsible = FALSE,
                 closable = FALSE,
                 width = 12,
-                plotlyOutput(outputId = ns("left_2"))
+                height = 500,
+                actionButton("adv_pc","Advanced"),
+                plotlyOutput(outputId = ns("left_1"))
               )
             )
           ),
           column(
-            width = 5,
+            width = 12,
             fluidRow(
               box(
-                title = strong("Right 1"),
+                title = strong("Training Boxplot"),
+                collapsible = FALSE,
+                collapsed = FALSE,
+                width = 6,
+                plotlyOutput(outputId = ns("train_bp"))
+
+              ),
+              box(
+                title = strong("Testing Boxplot"),
+                collapsible = FALSE,
+                collapsed = FALSE,
+                width = 6,
+                plotlyOutput(outputId = ns("test_bp"))
+              )
+            )
+          ),
+          column(
+            width = 12,
+            fluidRow(
+              box(
+                title = strong("Configuration Process"),
                 collapsible = FALSE,
                 closable = FALSE,
                 width = 12,
                 plotlyOutput(outputId = ns("right_1"))
               ),
               box(
-                title = strong("Right 2"),
+                title = strong("Sampling Frequency"),
                 collapsible = FALSE,
                 closable = FALSE,
                 width = 12,
-                plotlyOutput(outputId = ns("right_2"))
+                plotOutput(outputId = ns("right_2"))
               )
             )
           )
@@ -71,6 +104,9 @@ Overview <- R6::R6Class(
     },
 
     server = function(input, output, session, store) {
+      observeEvent(input$adv_pc,{
+
+      })
       output$configs <- renderUI({
         shiny::validate(
           need(
@@ -111,6 +147,40 @@ Overview <- R6::R6Class(
         h6(bestConfiguration[[1]])
       })
 
+      output$iterations <- renderUI({
+        shiny::validate(
+          need(
+            !is.null(store$irace_results),
+            ""
+          )
+        )
+        n_iterations <- length(store$irace_results$allElites)
+        h6(n_iterations)
+      })
+
+      output$instances <- renderUI({
+        shiny::validate(
+          need(
+            !is.null(store$irace_results),
+            ""
+          )
+        )
+        n_instances <- length(store$irace_results$experiments)
+        h6(n_instances)
+      })
+
+      output$elit <- renderUI({
+        shiny::validate(
+          need(
+            !is.null(store$irace_results),
+            ""
+          )
+        )
+        last <- length(store$irace_results$allElites)
+        n_elites_end <- length(store$irace_results$allElites[[last]])
+        h6(n_elites_end)
+      })
+
       output$right_1 <- renderPlotly({
         shiny::validate(
           need(
@@ -119,38 +189,10 @@ Overview <- R6::R6Class(
           )
         )
 
-        log <- store$irace_results$experimentLog
-        iterations <- unique(log[, "iteration"])
-        configurations <- store$irace_results$allConfigurations
-        configurations <- cbind(rep(0, times = nrow(configurations)), configurations)
-        colnames(configurations)[1] <- ".IT."
-
-
-        for (i in iterations) {
-          conf <- unique(log[log[, "iteration"] == i, "configuration"])
-          configurations[conf, ".IT."] <- i
-        }
-
-        parameters <- store$race_results$parameters
-
-        for (pname in parameters$names) {
-          if (parameters$types[pname] %in% c("r", "i")) {
-            configurations[, pname] <- as.numeric(configurations[, pname])
-          }
-        }
-
-        conf <- configurations
-        conf[, ".IT."] <- as.factor(conf[, ".IT."])
-
-        p <- ggplot(conf, aes(x = beta, fill = .IT.)) +
-          geom_density(alpha = 0.5) +
-          scale_fill_viridis_d(guide = "none") +
-          theme_bw()
-
-        ggplotly(p)
+        #iraceplot::plot_experiments_matrix(store$irace_results, interactive = )
       })
 
-      output$right_2 <- renderPlotly({
+      output$right_2 <- renderPlot({
         shiny::validate(
           need(
             !is.null(store$irace_results),
@@ -158,39 +200,36 @@ Overview <- R6::R6Class(
           )
         )
 
-        log <- store$irace_results$experimentLog
-        iterations <- unique(log[, "iteration"])
-        configurations <- store$irace_results$allConfigurations
-        configurations <- cbind(rep(0, times = nrow(configurations)), configurations)
-        colnames(configurations)[1] <- ".IT."
+        iraceplot::sampling_frequency(store$irace_results,n = 2)
 
+      })
 
-        for (i in iterations) {
-          conf <- unique(log[log[, "iteration"] == i, "configuration"])
-          configurations[conf, ".IT."] <- i
-        }
-
-        parameters <- store$race_results$parameters
-
-        for (pname in parameters$names) {
-          if (parameters$types[pname] %in% c("r", "i")) {
-            configurations[, pname] <- as.numeric(configurations[, pname])
-          }
-        }
-
-        conf <- configurations
-        conf[, ".IT."] <- as.factor(conf[, ".IT."])
-
-        p <- ggplot(conf, aes(x = alpha, y = beta)) +
-          geom_point() +
-          # geom_point() +
-          # geom_density(aes(x = alpha, y = ..density..), position = "stack") +
-          # geom_density(aes(x = beta, y = ..density..), position = "stack") +
-          # scale_fill_viridis(discrete = FALSE) +
-          facet_wrap(~.IT.)
-        theme_bw()
-
+      output$train_bp <- renderPlotly({
+        shiny::validate(
+          need(
+            !is.null(store$irace_results),
+            ""
+          )
+        )
+        p <- iraceplot::boxplot_training(irace_results = store$irace_results)
         ggplotly(p)
+      })
+
+      output$test_bp <- renderPlotly({
+        shiny::validate(
+          need(
+            !is.null(store$irace_results),
+            ""
+          )
+        )
+        if(!("testing" %in% names(store$irace_results))){
+          print("The Rdata does not contain the testing data")
+        }else{
+          p <- iraceplot::boxplot_test(irace_results = store$irace_results,type = "best")
+          ggplotly(p)
+        }
+
+
       })
 
       output$left_1 <- renderPlotly({
@@ -200,23 +239,7 @@ Overview <- R6::R6Class(
             ""
           )
         )
-
-        experiments <- store$irace_results$experiments[, unique(store$irace_results$iterationElites), drop = F]
-        # experiments <- store$irace_results$experiments
-
-        experiments[] <- rank(experiments, na.last = "keep")
-
-        p <- experiments %>%
-          as.data.frame() %>%
-          rownames_to_column("i_id") %>%
-          pivot_longer(-c(i_id), names_to = "C", values_to = "ERT") %>%
-          mutate(C = fct_relevel(C, as.character(1:ncol(experiments)))) %>%
-          mutate(i_id = fct_relevel(i_id, as.character(1:nrow(experiments)))) %>%
-          ggplot(aes(x = C, y = i_id, fill = ERT)) +
-          geom_bin2d() +
-          scale_fill_viridis_c()
-
-        ggplotly(p)
+        iraceplot::parallel_coord(store$irace_results)
       })
       # output$left_2 <- renderPlotly(
       #   plot_ly(z = ~volcano, type = "surface")
@@ -224,3 +247,4 @@ Overview <- R6::R6Class(
     }
   )
 )
+
