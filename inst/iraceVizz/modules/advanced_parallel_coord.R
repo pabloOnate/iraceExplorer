@@ -48,6 +48,24 @@ AdvancedParallelCoord <- R6::R6Class(
                  choices = c(),
                  inline = F
                )
+             ),
+             box(
+               title = "id_configuration",
+               sliderInput(
+                 inputId = ns("id_conf"),
+                 label = "",
+                 min = 0,
+                 max = 0,
+                 value = 0
+               )
+             ),
+             box(
+               title = "by_n_param",
+               numericInput(
+                inputId = ns("by_n"),
+                label = "",
+                value = 14
+               )
              )
             )),
             box(
@@ -82,7 +100,6 @@ AdvancedParallelCoord <- R6::R6Class(
 
       })
 
-      output$value <- renderPrint({input$group})
 
       output$adv_parallel_coord <- renderPlotly({
         shiny::validate(
@@ -93,10 +110,11 @@ AdvancedParallelCoord <- R6::R6Class(
         )
 
         iraceplot::parallel_coord(
-          store$irace_results,
+          irace_results =  store$irace_results,
           only_elite = input$radios,
           iterations = input$group,
-          param_names = input$param)
+          param_names = input$param,
+          by_n_param = input$by_n)
       })
     },
     setup_inputs = function(session, store){
@@ -110,7 +128,15 @@ AdvancedParallelCoord <- R6::R6Class(
         session = session,
         inputId = "param",
         choices = store$irace_results$parameters$names,
-        inline = F
+        inline = F,
+        selected = store$irace_results$parameters$names
+      )
+      updateSliderInput(
+        session = session,
+        inputId = "id_conf",
+        min = 1,
+        max = dim(store$irace_results$allConfigurations)[1]
+
       )
     }
 

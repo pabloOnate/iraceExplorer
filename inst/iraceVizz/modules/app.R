@@ -14,7 +14,7 @@ App <- R6::R6Class(
       volumes <- c("Home" = path.expand("~"), getVolumes()())
       showModal(
         modalDialog(
-          title = "Welcome to Irace Vizz",
+          title = "Welcome to Irace Explorer",
           footer = tagList(
             shinyFilesButton(
               id = "select",
@@ -66,7 +66,7 @@ App <- R6::R6Class(
 
     ui = function() {
       dashboardPage(
-        title = "Irace Vizz",
+        title = "Irace Explorer",
         dark = FALSE,
         # freshTheme = common_theme,
         header = private$navbar$ui("navbar"),

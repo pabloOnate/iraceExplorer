@@ -45,6 +45,7 @@ AdvancedBoxplotTest <- R6::R6Class(
     },
     server = function(input,output, session, store){
       ns <- session$ns
+      session$userData$fun <- "Pliss working"
       observeEvent(
         c(
           store$irace_results

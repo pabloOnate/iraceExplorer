@@ -37,6 +37,7 @@ Body <- R6::R6Class(
     advanced_boxplot_train = NULL,
     advanced_boxplot_test = NULL,
     advanced_sampling_frequency = NULL,
+    advanced_configuration_process = NULL,
 
 
     initialize = function() {
@@ -50,6 +51,7 @@ Body <- R6::R6Class(
       self$advanced_boxplot_train <- AdvancedBoxplotTrain$new("adv_boxplot_train")
       self$advanced_boxplot_test <- AdvancedBoxplotTest$new("adv_boxplot_test")
       self$advanced_sampling_frequency <- AdvancedSamplingFrequency$new("adv_sampling_frequency")
+      self$advanced_configuration_process <- AdvancedConfigurationProcess$new("adv_configuration_process")
     },
 
     ui = function() {
@@ -87,6 +89,10 @@ Body <- R6::R6Class(
           tabItem(
             tabName = "adv_sampling_frequency",
             self$advanced_sampling_frequency$ui()
+          ),
+          tabItem(
+            tabName = "adv_configuration_process",
+            self$advanced_configuration_process$ui()
           )
         )
       )
@@ -103,6 +109,10 @@ Body <- R6::R6Class(
       self$advanced_boxplot_train$call(store = store)
       self$advanced_boxplot_test$call(store = store)
       self$advanced_sampling_frequency$call(store = store)
+      self$advanced_configuration_process$call(store = store)
+    },
+    server = function(input, output, session, store){
+      observe(print(ns("sidebar")))
     }
   )
 )
@@ -111,11 +121,16 @@ Body <- R6::R6Class(
 Sidebar <- R6::R6Class(
   classname = "Sidebar",
   public = list(
+
     ui = function() {
+      ns <- NS(self$id)
+
       dashboardSidebar(
         id = "dash",
         minified = FALSE,
-        sidebarMenu(
+
+        bs4SidebarMenu(
+          id = ns("sidebar"),
           menuItem(
             text = "Overview",
             tabName = "overview",
@@ -157,13 +172,42 @@ Sidebar <- R6::R6Class(
               icon = NULL
             ),
             menuSubItem(
+              text = "Configuration Process",
+              tabName = "adv_configuration_process",
+              icon = NULL
+            ),
+            menuSubItem(
               text = "Sampling Frequency",
               tabName = "adv_sampling_frequency",
               icon = NULL
             )
           )
+        ),
+        bs4DashControlbar(
+          skin = "light",
+          selectInput(
+            inputId = "controller",
+            label = "Advanced",
+            choices = list("overview" = "overview","adv_boxplot_train"="adv_boxplot_train-sidebar","adv_parallel_coord_view"="adv_parallel_coord_view"),
+            selected = "adv_boxplot_train-sidebar"
+          )
+
         )
       )
+    },
+    server = function(input, output, session, store){
+      ns <- session$ns
+
+
+
+       observeEvent(input$controller, {
+         updatebs4TabItems(
+           session,
+           inputId = ns("sidebar"),
+           selected = input$controller
+         )
+       }, ignoreInit = TRUE)
+
     }
   )
 )

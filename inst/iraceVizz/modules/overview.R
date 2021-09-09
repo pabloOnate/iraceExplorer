@@ -55,7 +55,7 @@ Overview <- R6::R6Class(
                 closable = FALSE,
                 width = 12,
                 height = 500,
-                actionButton("adv_pc","Advanced"),
+                actionButton(inputId = ns("adv_pc"),"Advanced"),
                 plotlyOutput(outputId = ns("left_1"))
               )
             )
@@ -104,8 +104,10 @@ Overview <- R6::R6Class(
     },
 
     server = function(input, output, session, store) {
-      observeEvent(input$adv_pc,{
+      ns <- session$ns
 
+      observeEvent(input$adv_pc,{
+        #updatebs4TabItems(session,ns("sidebar"),"adv_parallel_coord_view")
       })
       output$configs <- renderUI({
         shiny::validate(
@@ -182,14 +184,7 @@ Overview <- R6::R6Class(
       })
 
       output$right_1 <- renderPlotly({
-        shiny::validate(
-          need(
-            !is.null(store$irace_results),
-            ""
-          )
-        )
-
-        #iraceplot::plot_experiments_matrix(store$irace_results, interactive = )
+        iraceplot::plot_experiments_matrix(store$irace_results, .interactive = interactive())
       })
 
       output$right_2 <- renderPlot({
